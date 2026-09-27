@@ -1,0 +1,21 @@
+{
+  "name": "amtrak-find-trains-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright + TypeScript tests for the Find Trains form on amtrak.com",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.20.4",
+    "typescript": "7.0.2"
+  }
+}

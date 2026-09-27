@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": [
+            "ES2022",
+            "DOM"
+        ],
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "types": [
+            "node"
+        ],
+        "strict": true,
+        "noEmit": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "src",
+        "tests",
+        "playwright.config.ts"
+    ]
+}
