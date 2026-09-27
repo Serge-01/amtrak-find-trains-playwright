@@ -2,10 +2,12 @@ import { test as base } from '@playwright/test';
 import type { SearchForm } from '../components/search-form';
 import { env } from '../config/env';
 import { HomePage } from '../pages/home-page';
+import type { CalendarDate } from '../utils/dates';
 
 interface Fixtures {
   homePage: HomePage;
   searchForm: SearchForm;
+  today: CalendarDate; // today's date in the browser
 }
 
 export const test = base.extend<Fixtures>({
@@ -32,6 +34,10 @@ export const test = base.extend<Fixtures>({
 
   searchForm: async ({ homePage }, use) => {
     await use(homePage.searchForm);
+  },
+
+  today: async ({ homePage }, use) => {
+    await use(await homePage.today());
   },
 });
 

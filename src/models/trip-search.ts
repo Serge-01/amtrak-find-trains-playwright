@@ -3,3 +3,5 @@ export interface Station {
   searchTerm: string; // what a user types to find it
   city: string; // city line on the selected-station card
 }
+
+export type TripType = 'One-Way' | 'Round-Trip';
