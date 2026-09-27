@@ -1,4 +1,6 @@
+import { Messages } from '../../src/data/booking-rules';
 import { Stations } from '../../src/data/stations';
+import { TripSearchBuilder } from '../../src/data/trip-search-builder';
 import { expect, test } from '../../src/fixtures/test';
 
 test.describe('Station selection', { tag: '@stations' }, () => {
@@ -24,5 +26,14 @@ test.describe('Station selection', { tag: '@stations' }, () => {
 
     await expect(searchForm.from.selection).toContainText(Stations.Washington.code);
     await expect(searchForm.to.selection).toContainText(Stations.NewYork.code);
+  });
+
+  test('the same station for From and To is rejected', async ({ searchForm, today }) => {
+    const search = TripSearchBuilder.validSearch(today).toStation(Stations.NewYork).build();
+
+    await searchForm.fill(search);
+
+    await expect(searchForm.validationError(Messages.sameStation)).toBeVisible();
+    await expect(searchForm.findTrainsButton).toBeDisabled();
   });
 });

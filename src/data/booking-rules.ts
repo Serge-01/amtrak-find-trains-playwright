@@ -7,6 +7,7 @@ export const BookingRules = {
 
 export const Messages = {
   invalidStation: 'Enter a valid station',
+  sameStation: 'Enter different origin and destination stations.',
   adultRequired: 'Add at least one adult 18 years old or older.',
   phoneBookingForLargeParty: 'Call 1-800-USA-RAIL to make reservations for 9 to 14 travelers.',
 };

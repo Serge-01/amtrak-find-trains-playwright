@@ -3,7 +3,7 @@ import { StationField } from './station-field';
 import { DatePicker } from './date-picker';
 import { TravelersPanel } from './travelers-panel';
 import type { CalendarDate } from '../utils/dates';
-import type { TripType } from '../models/trip-search';
+import { partySize, type TripSearch, type TripType } from '../models/trip-search';
 
 // The "Find trains" search form on the home page (the site's <amt-md-farefinder> element).
 export class SearchForm {
@@ -66,5 +66,26 @@ export class SearchForm {
       await this.datePicker.select(returnDate);
     }
     await this.datePicker.confirm();
+  }
+
+  // Fills in whatever the search contains; fields left undefined stay empty.
+  async fill(search: TripSearch): Promise<void> {
+    await this.selectTripType(search.tripType);
+    if (search.from) {
+      await this.from.choose(search.from);
+    }
+    if (search.to) {
+      await this.to.choose(search.to);
+    }
+    if (search.departDate) {
+      await this.chooseDates(search.departDate, search.returnDate);
+    }
+    // The form starts with one adult, so the travelers panel is only opened for other parties.
+    const isDefaultParty = search.party.adult === 1 && partySize(search.party) === 1;
+    if (!isDefaultParty) {
+      await this.travelers.open();
+      await this.travelers.setParty(search.party);
+      await this.travelers.close();
+    }
   }
 }
