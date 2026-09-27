@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { JOURNEY_SEARCH_URL, type JourneyRequest, type JourneySearchBody } from '../api/journey-search';
 import { StationField } from './station-field';
 import { DatePicker } from './date-picker';
 import { TravelersPanel } from './travelers-panel';
@@ -14,6 +15,8 @@ export class SearchForm {
   readonly findTrainsButton: Locator;
   readonly tripTypeToggle: Locator;
   readonly departDateLabel: Locator;
+  readonly departDateInput: Locator;
+  readonly returnDateInput: Locator;
   readonly datePicker: DatePicker;
   readonly travelers: TravelersPanel;
 
@@ -26,6 +29,10 @@ export class SearchForm {
     // The floating "Depart Date" label sits on top of the input and catches the click,
     // so the calendar is opened by clicking the label, as a user does.
     this.departDateLabel = this.root.locator('label', { hasText: 'Depart Date' }).filter({ visible: true });
+    // The depart and return inputs share one test ID, so data-julie tells them apart.
+    // It ends in _oneway or _roundtrip, hence ^= ("starts with") for the depart input.
+    this.departDateInput = this.root.locator('input[data-julie^="departdisplay_booking"]').filter({ visible: true });
+    this.returnDateInput = this.root.locator('input[data-julie="returndisplay_booking_roundtrip"]').filter({ visible: true });
     this.datePicker = new DatePicker(page);
     this.travelers = new TravelersPanel(page);
     // The page has a second, hidden copy of the button for the mobile layout.
@@ -87,5 +94,17 @@ export class SearchForm {
       await this.travelers.setParty(search.party);
       await this.travelers.close();
     }
+  }
+
+  // Clicks Find Trains and returns the search request the form sends. The request is
+  // stopped at the network layer so no search reaches the site: the scope ends at the
+  // click, and the site's bot protection rejects searches from automated browsers anyway.
+  async findTrainsAndCaptureRequest(): Promise<JourneyRequest> {
+    await this.page.route(JOURNEY_SEARCH_URL, (route) => route.abort());
+    const requestPromise = this.page.waitForRequest(JOURNEY_SEARCH_URL);
+    await this.findTrainsButton.click();
+    const request = await requestPromise;
+    const body: JourneySearchBody = request.postDataJSON();
+    return body.journeyRequest;
   }
 }

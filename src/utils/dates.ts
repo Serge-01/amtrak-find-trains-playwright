@@ -24,3 +24,18 @@ export function toAriaLabel(date: CalendarDate): string {
     day: 'numeric',
   });
 }
+
+// "10/18/2026": how the form shows a chosen date.
+export function toDisplayValue(date: CalendarDate): string {
+  return `${pad(date.month)}/${pad(date.day)}/${date.year}`;
+}
+
+// "2026-10-18": the date part of the departure time in the search request.
+export function toIsoDate(date: CalendarDate): string {
+  return `${date.year}-${pad(date.month)}-${pad(date.day)}`;
+}
+
+// 7 -> "07"
+function pad(value: number): string {
+  return String(value).padStart(2, '0');
+}
