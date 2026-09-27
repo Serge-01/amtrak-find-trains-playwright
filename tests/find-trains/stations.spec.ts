@@ -15,18 +15,21 @@ test.describe('Station selection', { tag: '@stations' }, () => {
     await expect(searchForm.from.selection).toContainText(station.city);
   });
 
-  // Known issue (see docs/test-plan.md): in automated runs the swap leaves the destination in
-  // both fields, e.g. WAS -> WAS, while a manual swap works. Parked to investigate with the
-  // trace instead of weakening the assertion.
-  test.fixme('swap button exchanges From and To', async ({ searchForm }) => {
-    await searchForm.from.choose(Stations.NewYork);
-    await searchForm.to.choose(Stations.Washington);
+  // Known issue, see docs/test-plan.md > Known issues. Swapping right after the To pick
+  // leaves WAS in both fields: the page skips its second station lookup. A manual swap works,
+  // and there's no readiness signal to wait for, so the assertion stays as it should be.
+  test.fixme(
+    'swap button exchanges From and To',
+    { annotation: { type: 'known issue', description: 'Swap right after choosing stations leaves the destination in both fields. See docs/test-plan.md.' } },
+    async ({ searchForm }) => {
+      await searchForm.from.choose(Stations.NewYork);
+      await searchForm.to.choose(Stations.Washington);
 
-    await searchForm.swapStationsButton.click();
+      await searchForm.swapStationsButton.click();
 
-    await expect(searchForm.from.selection).toContainText(Stations.Washington.code);
-    await expect(searchForm.to.selection).toContainText(Stations.NewYork.code);
-  });
+      await expect(searchForm.from.selection).toContainText(Stations.Washington.code);
+      await expect(searchForm.to.selection).toContainText(Stations.NewYork.code);
+    });
 
   test('the same station for From and To is rejected', async ({ searchForm, today }) => {
     const search = TripSearchBuilder.validSearch(today).toStation(Stations.NewYork).build();
