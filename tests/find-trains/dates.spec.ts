@@ -1,4 +1,4 @@
-import { Stations } from '../../src/data/stations';
+import { TripSearchBuilder } from '../../src/data/trip-search-builder';
 import { expect, test } from '../../src/fixtures/test';
 import { addDays } from '../../src/utils/dates';
 
@@ -15,9 +15,7 @@ test.describe('Date selection', { tag: '@dates' }, () => {
   test('round trip dates cannot be confirmed without a return date', async ({ searchForm, today }) => {
     const departDate = addDays(today, 14);
     const returnDate = addDays(departDate, 3);
-    await searchForm.selectTripType('Round-Trip');
-    await searchForm.from.choose(Stations.NewYork);
-    await searchForm.to.choose(Stations.Washington);
+    await searchForm.fill(TripSearchBuilder.validSearch(today).roundTrip().withoutDepartDate().build());
 
     await searchForm.openDatePicker();
     await searchForm.datePicker.select(departDate);

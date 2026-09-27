@@ -1,8 +1,7 @@
 import { BookingRules, Messages } from '../../src/data/booking-rules';
-import { Stations } from '../../src/data/stations';
+import { TripSearchBuilder } from '../../src/data/trip-search-builder';
 import { expect, test } from '../../src/fixtures/test';
 import { TRAVELER_TYPES } from '../../src/models/trip-search';
-import { addDays } from '../../src/utils/dates';
 
 test.describe('Travelers', { tag: '@travelers' }, () => {
   test('starts with one adult and no other travelers', async ({ searchForm }) => {
@@ -19,9 +18,7 @@ test.describe('Travelers', { tag: '@travelers' }, () => {
 
   test(`up to ${BookingRules.maxTravelersOnline} travelers can search online, one more is sent to phone booking`, async ({ searchForm, today }) => {
     const max = BookingRules.maxTravelersOnline;
-    await searchForm.from.choose(Stations.NewYork);
-    await searchForm.to.choose(Stations.Washington);
-    await searchForm.chooseDates(addDays(today, 14));
+    await searchForm.fill(TripSearchBuilder.validSearch(today).build());
     await searchForm.travelers.open();
 
     await searchForm.travelers.add('adult', max - 1);
@@ -34,9 +31,7 @@ test.describe('Travelers', { tag: '@travelers' }, () => {
   });
 
   test('an infant cannot travel without an adult', async ({ searchForm, today }) => {
-    await searchForm.from.choose(Stations.NewYork);
-    await searchForm.to.choose(Stations.Washington);
-    await searchForm.chooseDates(addDays(today, 14));
+    await searchForm.fill(TripSearchBuilder.validSearch(today).build());
     await searchForm.travelers.open();
 
     await searchForm.travelers.remove('adult');
