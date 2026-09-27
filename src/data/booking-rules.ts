@@ -1,4 +1,4 @@
-// Business rules and messages observed on amtrak.com/home.
+// Business rules and messages observed on amtrak.com/home (see docs/test-plan.md, "Assumptions and risks").
 // Tests read expected values from here instead of hard-coding them.
 
 export const BookingRules = {
