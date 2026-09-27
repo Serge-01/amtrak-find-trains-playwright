@@ -1,4 +1,4 @@
-import type { TripType } from '../models/trip-search';
+import type { TravelerType, TripType } from '../models/trip-search';
 
 // The request the form sends when Find Trains is clicked, right before it opens the
 // results page. The body wraps the search in "journeyRequest". Only the fields the
@@ -22,6 +22,15 @@ export interface JourneyLeg {
 export const TRIP_TYPE_CODES: Record<TripType, string> = {
   'One-Way': 'OW',
   'Round-Trip': 'RT',
+};
+
+// How the request names each traveler type. Only senior differs: the request says "seniors".
+export const PASSENGER_TYPE_NAMES: Record<TravelerType, string> = {
+  adult: 'adult',
+  senior: 'seniors',
+  youth: 'youth',
+  child: 'child',
+  infant: 'infant',
 };
 
 // URL of the search request, as a pattern for page.route() and page.waitForRequest().

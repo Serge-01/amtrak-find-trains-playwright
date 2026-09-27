@@ -23,11 +23,11 @@ test.describe('Search submission', { tag: '@submission' }, () => {
   });
 
   test('round-trip search for a group sends both legs and every traveler', async ({ searchForm, today }) => {
-    const search = TripSearchBuilder.validSearch(today).roundTrip().withParty({ adult: 2, child: 1 }).build();
+    const search = TripSearchBuilder.validSearch(today).roundTrip().withParty({ adult: 2, senior: 1, youth: 1, child: 1, infant: 1 }).build();
 
     await searchForm.fill(search);
     await expect(searchForm.returnDateInput).toHaveValue(toDisplayValue(search.returnDate!));
-    await expect(searchForm.travelers.toggle).toHaveAccessibleName(/^3 Travelers/);
+    await expect(searchForm.travelers.toggle).toHaveAccessibleName(/^6 Travelers/);
 
     const request = await searchForm.findTrainsAndCaptureRequest();
     await attachJson('search-request.json', request);

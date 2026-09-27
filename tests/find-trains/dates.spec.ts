@@ -13,15 +13,15 @@ test.describe('Date selection', { tag: '@dates' }, () => {
   });
 
   test('round trip dates cannot be confirmed without a return date', async ({ searchForm, today }) => {
-    const departDate = addDays(today, 14);
-    const returnDate = addDays(departDate, 3);
-    await searchForm.fill(TripSearchBuilder.validSearch(today).roundTrip().withoutDepartDate().build());
+    const search = TripSearchBuilder.validSearch(today).roundTrip().build();
+    // Everything except the dates, which this test picks one at a time.
+    await searchForm.fill({ ...search, departDate: undefined, returnDate: undefined });
 
     await searchForm.openDatePicker();
-    await searchForm.datePicker.select(departDate);
+    await searchForm.datePicker.select(search.departDate!);
     await expect(searchForm.datePicker.doneButton).toBeDisabled();
 
-    await searchForm.datePicker.select(returnDate);
+    await searchForm.datePicker.select(search.returnDate!);
     await expect(searchForm.datePicker.doneButton).toBeEnabled();
 
     await searchForm.datePicker.confirm();

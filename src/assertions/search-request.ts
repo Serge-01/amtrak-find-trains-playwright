@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { TRIP_TYPE_CODES, type JourneyRequest } from '../api/journey-search';
+import { PASSENGER_TYPE_NAMES, TRIP_TYPE_CODES, type JourneyRequest } from '../api/journey-search';
 import { TRAVELER_TYPES, type Party, type Station, type TripSearch } from '../models/trip-search';
 import { toIsoDate, type CalendarDate } from '../utils/dates';
 
@@ -9,18 +9,22 @@ export function expectRequestToMatchSearch(request: JourneyRequest, search: Trip
   if (!from || !to || !departDate) {
     throw new Error('expectRequestToMatchSearch needs a complete search');
   }
-  const [outbound, inbound] = request.journeyLegRequests;
-
-  expect(request.type).toBe(TRIP_TYPE_CODES[search.tripType]);
-  expect(outbound).toMatchObject(expectedLeg(from, to, departDate));
-
-  if (search.tripType === 'Round-Trip' && returnDate) {
-    expect(inbound).toMatchObject(expectedLeg(to, from, returnDate));
-  } else {
-    expect(request.journeyLegRequests).toHaveLength(1);
+  if (search.tripType === 'Round-Trip' && !returnDate) {
+    throw new Error('expectRequestToMatchSearch needs a return date for a round trip');
   }
 
+  expect(request.type).toBe(TRIP_TYPE_CODES[search.tripType]);
+
+  // The outbound leg, plus the same trip reversed for a round trip. On an array,
+  // toMatchObject also checks the length, so an extra or a missing leg fails.
+  const expectedLegs = [expectedLeg(from, to, departDate)];
+  if (returnDate) {
+    expectedLegs.push(expectedLeg(to, from, returnDate));
+  }
+  expect(request.journeyLegRequests).toMatchObject(expectedLegs);
+
   // Travelers are listed on the outbound leg, e.g. ['adult', 'adult', 'child'].
+  const outbound = request.journeyLegRequests[0];
   const sentTravelers = outbound.passengers.map((passenger) => passenger.initialType).sort();
   expect(sentTravelers).toEqual(travelerList(search.party).sort());
 }
@@ -33,12 +37,12 @@ function expectedLeg(from: Station, to: Station, date: CalendarDate) {
   };
 }
 
-// { adult: 2, child: 1 } -> ['adult', 'adult', 'child']
+// { adult: 2, senior: 1 } -> ['adult', 'adult', 'seniors'], in the request's own names
 function travelerList(party: Party): string[] {
   const list: string[] = [];
   for (const type of TRAVELER_TYPES) {
     for (let i = 0; i < (party[type] ?? 0); i++) {
-      list.push(type);
+      list.push(PASSENGER_TYPE_NAMES[type]);
     }
   }
   return list;

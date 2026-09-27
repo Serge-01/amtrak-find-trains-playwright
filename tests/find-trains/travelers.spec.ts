@@ -40,6 +40,7 @@ test.describe('Travelers', { tag: '@travelers' }, () => {
     await expect(searchForm.findTrainsButton).toBeDisabled();
 
     await searchForm.travelers.add('adult');
+    await expect(searchForm.travelers.messages).not.toContainText(Messages.adultRequired);
     await expect(searchForm.findTrainsButton).toBeEnabled();
   });
 });

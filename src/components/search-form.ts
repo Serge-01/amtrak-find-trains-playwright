@@ -45,8 +45,7 @@ export class SearchForm {
   }
 
   async waitUntilReady(): Promise<void> {
-    // The home page is heavy, so this one check gets a longer ceiling than the 5s default.
-    await expect(this.findTrainsButton).toBeVisible({ timeout: 15_000 });
+    await expect(this.findTrainsButton).toBeVisible();
     await expect(this.from.input).toBeEditable();
   }
 
@@ -105,6 +104,8 @@ export class SearchForm {
     await this.findTrainsButton.click();
     const request = await requestPromise;
     const body: JourneySearchBody = request.postDataJSON();
+    expect(body, 'search request body has an unexpected shape')
+      .toHaveProperty('journeyRequest.journeyLegRequests.0.passengers');
     return body.journeyRequest;
   }
 }
