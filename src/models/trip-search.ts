@@ -5,3 +5,8 @@ export interface Station {
 }
 
 export type TripType = 'One-Way' | 'Round-Trip';
+
+export type TravelerType = 'adult' | 'senior' | 'youth' | 'child' | 'infant';
+
+// Same order as the travelers panel.
+export const TRAVELER_TYPES: TravelerType[] = ['adult', 'senior', 'youth', 'child', 'infant'];

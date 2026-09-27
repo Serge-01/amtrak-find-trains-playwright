@@ -1,6 +1,8 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { StationField } from './station-field';
 import { DatePicker } from './date-picker';
+import { TravelersPanel } from './travelers-panel';
+import type { CalendarDate } from '../utils/dates';
 import type { TripType } from '../models/trip-search';
 
 // The "Find trains" search form on the home page (the site's <amt-md-farefinder> element).
@@ -13,6 +15,7 @@ export class SearchForm {
   readonly tripTypeToggle: Locator;
   readonly departDateLabel: Locator;
   readonly datePicker: DatePicker;
+  readonly travelers: TravelersPanel;
 
   constructor(private readonly page: Page) {
     this.root = page.locator('amt-md-farefinder');
@@ -24,6 +27,7 @@ export class SearchForm {
     // so the calendar is opened by clicking the label, as a user does.
     this.departDateLabel = this.root.locator('label', { hasText: 'Depart Date' }).filter({ visible: true });
     this.datePicker = new DatePicker(page);
+    this.travelers = new TravelersPanel(page);
     // The page has a second, hidden copy of the button for the mobile layout.
     this.findTrainsButton = this.root.getByTestId('fare-finder-findtrains-button').filter({ visible: true });
   }
@@ -52,5 +56,15 @@ export class SearchForm {
   async openDatePicker(): Promise<void> {
     await this.departDateLabel.click();
     await expect(this.datePicker.root).toBeVisible();
+  }
+
+  // Opens the calendar from the Depart field, picks the date(s), then clicks Done.
+  async chooseDates(departDate: CalendarDate, returnDate?: CalendarDate): Promise<void> {
+    await this.openDatePicker();
+    await this.datePicker.select(departDate);
+    if (returnDate) {
+      await this.datePicker.select(returnDate);
+    }
+    await this.datePicker.confirm();
   }
 }
